@@ -110,6 +110,31 @@ body {
     100% { transform: translate(4vw, 3vw) scale(1.02); }
 }
 
+/* ── Minimal Shapes ── */
+.bg-shape {
+    position: absolute;
+    color: var(--color-accent-dark);
+    opacity: 0.12; /* Very minimal */
+    animation: shapeFloat 40s infinite linear;
+    pointer-events: none;
+}
+.bg-shape-1 { top: 15%; left: 8%; font-size: 4.5rem; animation-duration: 45s; }
+.bg-shape-2 { top: 60%; right: 10%; font-size: 3.5rem; animation-duration: 38s; animation-direction: reverse; }
+.bg-shape-3 { bottom: 12%; left: 15%; font-size: 2.5rem; animation-duration: 30s; }
+.bg-shape-4 { top: 25%; right: 18%; font-size: 3rem; animation-duration: 35s; }
+.bg-shape-5 { top: 75%; left: 45%; font-size: 6rem; animation-duration: 50s; opacity: 0.06; }
+.bg-shape-6 { top: 40%; left: 80%; font-size: 2rem; animation-duration: 25s; animation-direction: reverse; }
+
+[data-theme="dark"] .bg-shape {
+    opacity: 0.06;
+}
+
+@keyframes shapeFloat {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-80px) rotate(180deg); }
+    100% { transform: translateY(0) rotate(360deg); }
+}
+
 /* ═══════════════════════════════════════════
    TYPOGRAPHY
 ═══════════════════════════════════════════ */
