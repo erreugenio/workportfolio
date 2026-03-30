@@ -340,10 +340,10 @@ a { text-decoration: none; color: inherit; }
     will-change: opacity, transform;
 }
 
-/* Fade up (default) */
+/* Fade up (default) — spec: 20px up + scale 0.95→1 */
 .fade-up {
-    transform: translateY(36px);
-    transition: opacity 0.72s var(--ease), transform 0.72s var(--ease);
+    transform: translateY(20px) scale(0.95);
+    transition: opacity 0.75s var(--ease), transform 0.75s var(--ease);
 }
 
 /* Fade from left */
@@ -358,10 +358,10 @@ a { text-decoration: none; color: inherit; }
     transition: opacity 0.72s var(--ease), transform 0.72s var(--ease);
 }
 
-/* Scale in */
+/* Scale in — unified with fade-up spec: scale 0.95 + 20px */
 .scale-in {
-    transform: scale(0.93);
-    transition: opacity 0.72s var(--ease), transform 0.72s var(--ease);
+    transform: translateY(20px) scale(0.95);
+    transition: opacity 0.75s var(--ease), transform 0.75s var(--ease);
 }
 
 /* Visible state */
@@ -400,6 +400,41 @@ a { text-decoration: none; color: inherit; }
 .fade-up.in-view .section-label::after,
 .in-view > .section-label::after {
     transform: scaleX(1);
+}
+
+/* ── Parallax elements ── */
+/* JS sets translateY via inline style; will-change avoids repaints */
+[data-parallax] {
+    will-change: transform;
+    /* Don't let JS transform fight the reveal transition */
+    transition: opacity 0.75s var(--ease);
+}
+/* When a parallax section header is also a fade-up, restore transform compositing */
+[data-parallax].fade-up,
+[data-parallax].fade-left,
+[data-parallax].fade-right {
+    transition: opacity 0.75s var(--ease), transform 0.75s var(--ease);
+}
+
+/* ── Image reveal-mask ── */
+/* Applied to .portfolio-visual and .hero-image wrappers */
+.img-reveal {
+    /* Clip from bottom: hidden until observer fires */
+    clip-path: inset(100% 0 0% 0);
+    transition: clip-path 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: clip-path;
+}
+.img-reveal.in-view {
+    clip-path: inset(0% 0 0% 0);
+}
+/* Stagger delays for img-reveal */
+.img-reveal.delay-1 { transition-delay: 0.12s; }
+.img-reveal.delay-2 { transition-delay: 0.22s; }
+
+/* ── Luxurious smooth scroll ── */
+html {
+    /* smooth-scroll is already on html; reinforce with scroll-timeline awareness */
+    scroll-behavior: smooth;
 }
 
 /* ═══════════════════════════════════════════
@@ -756,27 +791,78 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ═══════════════════════════════════════════
-   PORTFOLIO
+   PORTFOLIO — CAROUSEL
 ═══════════════════════════════════════════ */
-.portfolio-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 28px;
+
+/* ── Spring entrance keyframes ── */
+@keyframes springEntrance {
+    0%   { opacity: 0; transform: translateY(52px) scale(0.90); }
+    60%  { opacity: 1; transform: translateY(-8px) scale(1.02); }
+    80%  { transform: translateY(4px) scale(0.99); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* ── Wrapper: clips the sliding track ── */
+.carousel-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    /* extra horizontal room for the arrow buttons */
+    padding: 0 52px;
+    box-sizing: border-box;
+    /* prevent vertical scroll interference on touch */
+    touch-action: pan-y;
+}
+
+/* ── Sliding track ── */
+.carousel-track {
+    display: flex;
+    gap: 24px;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    will-change: transform;
+    /* JS sets transform: translateX() */
+}
+.carousel-track.is-dragging {
+    cursor: grabbing;
+}
+/* Kill transitions while JS spring is running */
+.carousel-track.no-transition {
+    transition: none !important;
+}
+
+/* ── Individual slides ── */
+.carousel-slide {
+    /* Desktop: 3-up */
+    flex: 0 0 calc(33.333% - 16px);
+    min-width: 0;
+}
+
+/* Spring entrance animation applied per slide */
+.carousel-slide.spring-enter {
+    animation: springEntrance 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--stagger-delay, 0ms);
+}
+
+/* ── Portfolio card (inner) ── */
 .portfolio-card {
-    width: calc(33.333% - 18px);
-    min-width: 300px;
+    width: 100%;
     border-radius: var(--radius-md);
     overflow: hidden;
     border: 1px solid var(--color-border);
     background: var(--color-bg-card);
-    transition: var(--transition);
+    transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease), border-color 0.45s var(--ease);
+    /* prevent card from inheriting grab cursor */
+    cursor: default;
 }
 .portfolio-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
     box-shadow: var(--shadow-md);
+    border-color: var(--color-accent);
 }
+
+/* ── Card visual / image / overlay ── */
 .portfolio-visual {
     height: 220px;
     overflow: hidden;
@@ -789,6 +875,7 @@ a { text-decoration: none; color: inherit; }
     height: 100%;
     object-fit: cover;
     transition: transform 0.6s var(--ease);
+    pointer-events: none; /* let drag fall through to track */
 }
 .portfolio-overlay {
     position: absolute;
@@ -802,7 +889,7 @@ a { text-decoration: none; color: inherit; }
     color: #fff;
     font-size: 2.2rem;
 }
-.portfolio-visual:hover .portfolio-img    { transform: scale(1.05); }
+.portfolio-visual:hover .portfolio-img    { transform: scale(1.06); }
 .portfolio-visual:hover .portfolio-overlay { opacity: 1; }
 .portfolio-content {
     padding: 24px 28px;
@@ -811,6 +898,76 @@ a { text-decoration: none; color: inherit; }
 .portfolio-content h3 { font-size: 1rem; margin-bottom: 8px; }
 .portfolio-content p  { font-size: 0.875rem; }
 
+/* ── Arrow navigation buttons ── */
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    color: var(--color-text);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+    /* prevent triggering drag on the track */
+    pointer-events: all;
+}
+.carousel-btn:hover {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent-dark);
+    color: var(--color-accent-dark);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-50%) scale(1.08);
+}
+.carousel-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: translateY(-50%) scale(1);
+}
+.carousel-btn--prev { left: 4px; }
+.carousel-btn--next { right: 4px; }
+
+/* ── Dot indicators ── */
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 28px;
+    padding-bottom: 4px;
+}
+.carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-border);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.3s var(--ease), transform 0.3s var(--ease), width 0.35s var(--ease);
+    flex-shrink: 0;
+}
+.carousel-dot.active {
+    background: var(--color-accent-dark);
+    width: 22px;
+    border-radius: var(--radius-full);
+    transform: none;
+}
+.carousel-dot:hover:not(.active) {
+    background: var(--color-accent);
+    transform: scale(1.2);
+}
+
+/* ── Video showcase (unchanged) ── */
 .portfolio-videos {
     display: flex;
     gap: 28px;
@@ -829,13 +986,35 @@ a { text-decoration: none; color: inherit; }
 .video-container {
     flex: 1;
     position: relative;
-    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    padding-top: 56.25%; /* 16:9 */
     border-radius: var(--radius-md);
     overflow: hidden;
     border: 1px solid var(--color-border);
 }
 
-@media (max-width: 768px) {
+/* ── Responsive: 2-up at tablet ── */
+@media (max-width: 960px) {
+    .carousel-slide {
+        flex: 0 0 calc(50% - 12px);
+    }
+    .carousel-wrapper {
+        padding: 0 44px;
+    }
+}
+
+/* ── Responsive: 1-up at mobile (auto-stack) ── */
+@media (max-width: 640px) {
+    .carousel-slide {
+        flex: 0 0 calc(100%);
+    }
+    .carousel-wrapper {
+        padding: 0 36px;
+    }
+    .carousel-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 0.95rem;
+    }
     .portfolio-videos {
         flex-direction: column;
     }

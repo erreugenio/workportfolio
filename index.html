@@ -51,10 +51,10 @@
     <!-- ═══════════════ HERO ═══════════════ -->
     <section id="hero" class="hero">
         <div class="container hero-content">
-            <div class="hero-image fade-up">
+            <div class="hero-image fade-up img-reveal" id="heroImage">
                 <img src="assets/profile.jpg" alt="Errliza Eugenio" class="profile-pic">
             </div>
-            <div class="hero-text fade-up delay-1">
+            <div class="hero-text fade-up delay-1" data-parallax="0.10">
                 <span class="eyebrow">Executive &amp; Virtual Assistant</span>
                 <h1 class="name">Errliza<br>Eugenio</h1>
                 <p class="tagline">I help busy professionals stay organized,<br>on track, and stress-free.</p>
@@ -103,7 +103,7 @@
     <!-- ═══════════════ EDUCATION & EXPERIENCE ═══════════════ -->
     <section id="experience" class="experience section-spacing">
         <div class="container">
-            <div class="section-header fade-up">
+            <div class="section-header fade-up" data-parallax="0.18">
                 <span class="section-label">Background</span>
                 <h2 class="section-title">Education &amp; Experience</h2>
             </div>
@@ -167,7 +167,7 @@
 
     <section id="services" class="services section-spacing">
         <div class="container">
-            <div class="section-header fade-up">
+            <div class="section-header fade-up" data-parallax="0.18">
                 <span class="section-label">What I Offer</span>
                 <h2 class="section-title">Core Services</h2>
             </div>
@@ -224,62 +224,95 @@
     <!-- ═══════════════ PORTFOLIO ═══════════════ -->
     <section id="portfolio" class="portfolio section-spacing bg-light">
         <div class="container">
-            <div class="section-header fade-up">
+            <div class="section-header fade-up" data-parallax="0.18">
                 <span class="section-label">Portfolio</span>
                 <h2 class="section-title">Sample Work</h2>
             </div>
-            <div class="portfolio-grid">
-                <div class="portfolio-card scale-in">
-                    <div class="portfolio-visual" onclick="openLightbox('assets/media__1774128506565.jpg')">
-                        <img src="assets/media__1774128506565.jpg" alt="Tarot Reading Graphics" class="portfolio-img">
-                        <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
+            <!-- Carousel -->
+            <div class="carousel-wrapper fade-up" id="portfolioCarousel" role="region" aria-label="Sample Work Carousel">
+
+                <!-- Prev / Next arrows -->
+                <button class="carousel-btn carousel-btn--prev" id="carouselPrev" aria-label="Previous slide">
+                    <i class="ph ph-arrow-left"></i>
+                </button>
+                <button class="carousel-btn carousel-btn--next" id="carouselNext" aria-label="Next slide">
+                    <i class="ph ph-arrow-right"></i>
+                </button>
+
+                <!-- Scrollable track -->
+                <div class="carousel-track" id="carouselTrack">
+
+                    <div class="carousel-slide">
+                        <div class="portfolio-card">
+                            <div class="portfolio-visual img-reveal" onclick="openLightbox('assets/media__1774128506565.jpg')">
+                                <img src="assets/media__1774128506565.jpg" alt="Tarot Reading Graphics" class="portfolio-img">
+                                <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
+                            </div>
+                            <div class="portfolio-content">
+                                <h3>Graphic Design — Tarot</h3>
+                                <p>Promotional graphics with custom typography, soft colors, and a playful layout.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="portfolio-content">
-                        <h3>Graphic Design — Tarot</h3>
-                        <p>Promotional graphics with custom typography, soft colors, and a playful layout.</p>
+
+                    <div class="carousel-slide">
+                        <div class="portfolio-card">
+                            <div class="portfolio-visual img-reveal delay-1" onclick="openLightbox('assets/media__1774128506571.jpg')">
+                                <img src="assets/media__1774128506571.jpg" alt="Keychain Graphics" class="portfolio-img">
+                                <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
+                            </div>
+                            <div class="portfolio-content">
+                                <h3>Product Showcase Graphics</h3>
+                                <p>Marketing graphics for an accessory collection with custom branding.</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="portfolio-card scale-in delay-1">
-                    <div class="portfolio-visual" onclick="openLightbox('assets/media__1774128506571.jpg')">
-                        <img src="assets/media__1774128506571.jpg" alt="Keychain Graphics" class="portfolio-img">
-                        <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
+
+                    <div class="carousel-slide">
+                        <div class="portfolio-card">
+                            <div class="portfolio-visual img-reveal" onclick="openLightbox('assets/media__1774128506586.jpg')">
+                                <img src="assets/media__1774128506586.jpg" alt="Inbox Management" class="portfolio-img">
+                                <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
+                            </div>
+                            <div class="portfolio-content">
+                                <h3>Inbox Management System</h3>
+                                <p>Custom routing rules and triaged backlogged emails for maximum efficiency.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="portfolio-content">
-                        <h3>Product Showcase Graphics</h3>
-                        <p>Marketing graphics for an accessory collection with custom branding.</p>
+
+                    <div class="carousel-slide">
+                        <div class="portfolio-card">
+                            <div class="portfolio-visual img-reveal delay-1" onclick="openLightbox('assets/media__1774128506607.jpg')">
+                                <img src="assets/media__1774128506607.jpg" alt="Slide Decks" class="portfolio-img">
+                                <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
+                            </div>
+                            <div class="portfolio-content">
+                                <h3>Slide Deck Presentations</h3>
+                                <p>Clean, structured designs tailored for readability and clear storytelling.</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="portfolio-card scale-in delay-2">
-                    <div class="portfolio-visual" onclick="openLightbox('assets/media__1774128506586.jpg')">
-                        <img src="assets/media__1774128506586.jpg" alt="Inbox Management" class="portfolio-img">
-                        <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
+
+                    <div class="carousel-slide">
+                        <div class="portfolio-card">
+                            <div class="portfolio-visual img-reveal" onclick="openLightbox('assets/media__1774128506633.jpg')">
+                                <img src="assets/media__1774128506633.jpg" alt="Google Sheets" class="portfolio-img">
+                                <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
+                            </div>
+                            <div class="portfolio-content">
+                                <h3>Google Sheets Organization</h3>
+                                <p>Data tracking, attendance sheets, and structured schedules across multiple teams.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="portfolio-content">
-                        <h3>Inbox Management System</h3>
-                        <p>Custom routing rules and triaged backlogged emails for maximum efficiency.</p>
-                    </div>
-                </div>
-                <div class="portfolio-card scale-in delay-1">
-                    <div class="portfolio-visual" onclick="openLightbox('assets/media__1774128506607.jpg')">
-                        <img src="assets/media__1774128506607.jpg" alt="Slide Decks" class="portfolio-img">
-                        <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
-                    </div>
-                    <div class="portfolio-content">
-                        <h3>Slide Deck Presentations</h3>
-                        <p>Clean, structured designs tailored for readability and clear storytelling.</p>
-                    </div>
-                </div>
-                <div class="portfolio-card scale-in delay-2">
-                    <div class="portfolio-visual" onclick="openLightbox('assets/media__1774128506633.jpg')">
-                        <img src="assets/media__1774128506633.jpg" alt="Google Sheets" class="portfolio-img">
-                        <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
-                    </div>
-                    <div class="portfolio-content">
-                        <h3>Google Sheets Organization</h3>
-                        <p>Data tracking, attendance sheets, and structured schedules across multiple teams.</p>
-                    </div>
-                </div>
-            </div>
+
+                </div><!-- /carousel-track -->
+
+                <!-- Dot indicators -->
+                <div class="carousel-dots" id="carouselDots" role="tablist" aria-label="Carousel navigation"></div>
+
+            </div><!-- /carousel-wrapper -->
 
             <div class="video-showcase-header fade-up">
                 <h3>Video Editing Showcase</h3>
@@ -298,7 +331,7 @@
     <!-- ═══════════════ TOOLS ═══════════════ -->
     <section id="skills" class="skills section-spacing">
         <div class="container">
-            <div class="section-header fade-up">
+            <div class="section-header fade-up" data-parallax="0.18">
                 <span class="section-label">My Stack</span>
                 <h2 class="section-title">Tools &amp; Tech</h2>
             </div>
@@ -361,7 +394,7 @@
     <!-- ═══════════════ HOW I WORK ═══════════════ -->
     <section id="workflow" class="workflow section-spacing bg-light">
         <div class="container">
-            <div class="section-header fade-up">
+            <div class="section-header fade-up" data-parallax="0.18">
                 <span class="section-label">My Process</span>
                 <h2 class="section-title">How I Work</h2>
             </div>
