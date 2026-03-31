@@ -59,6 +59,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const yearEl = document.getElementById('year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+    // ── Services Tabs ──────────────────────────────────────────
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active from all tabs & panes
+            tabBtns.forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            });
+            tabPanes.forEach(p => p.classList.remove('active'));
+
+            // Add active to clicked target
+            btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
+            
+            const targetId = btn.getAttribute('data-target');
+            const targetPane = document.getElementById(targetId);
+            if (targetPane) {
+                targetPane.classList.add('active');
+                
+                // Immediately reveal items since they might have missed the initial intersection observer
+                const animatedItems = targetPane.querySelectorAll('.scale-in, .fade-up, .fade-left, .fade-right');
+                animatedItems.forEach(item => {
+                    // Small delay ensures the display: block has kicked in
+                    setTimeout(() => item.classList.add('in-view'), 10);
+                });
+            }
+        });
+    });
+
     // ── Scroll reveal (fade-up / fade-left / fade-right / scale-in) ──────
     // Threshold 0.1 — fires earlier for text/card elements
     const fadeEls = document.querySelectorAll('.fade-up, .fade-left, .fade-right, .scale-in');
