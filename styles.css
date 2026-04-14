@@ -1551,8 +1551,8 @@ footer {
    PROFESSIONAL CREDENTIALS
 ═══════════════════════════════════════════════════════ */
 .credentials {
-    background: #0f0a14;
-    color: #fff;
+    background: var(--color-bg-alt);
+    color: var(--color-text);
 }
 
 .cred-grid {
@@ -1576,8 +1576,8 @@ footer {
 
 .cred-card {
     position: relative;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
     backdrop-filter: blur(20px);
@@ -1589,8 +1589,8 @@ footer {
 }
 
 .cred-card:hover {
-    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6);
-    border-color: rgba(201, 160, 199, 0.3);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-accent);
 }
 
 .cred-card img {
@@ -1600,7 +1600,7 @@ footer {
     pointer-events: none;
     transform: translateZ(20px); /* 6DOF popout */
     transition: transform 0.4s;
-    background: #0a0a0a;
+    background: var(--color-bg);
 }
 
 /* Hero Variant (BLEPT) */
@@ -1612,7 +1612,14 @@ footer {
     min-height: 380px;
     text-align: center;
     padding: 40px;
-    background: radial-gradient(circle at 70% 30%, rgba(201, 160, 199, 0.08), transparent 60%), rgba(20, 15, 25, 0.8);
+}
+.cred-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 70% 30%, var(--color-accent), transparent 60%);
+    opacity: 0.15;
+    pointer-events: none;
 }
 
 .cred-hologram {
@@ -1621,9 +1628,9 @@ footer {
     background: conic-gradient(
         from 0deg,
         transparent 0deg,
-        rgba(255,255,255,0.05) 60deg,
-        rgba(201,160,199,0.15) 120deg,
-        rgba(255,255,255,0.05) 180deg,
+        var(--color-border) 60deg,
+        var(--color-accent) 120deg,
+        var(--color-border) 180deg,
         transparent 240deg
     );
     transform: translateZ(0px);
@@ -1646,7 +1653,7 @@ footer {
     font-size: 2.2rem;
     font-weight: 700;
     margin-bottom: 12px;
-    background: linear-gradient(135deg, #fff, #c9a0c7);
+    background: linear-gradient(135deg, var(--color-text), var(--color-accent));
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1656,7 +1663,7 @@ footer {
 
 .cred-hero p {
     font-size: 1.15rem;
-    color: rgba(255,255,255,0.7);
+    color: var(--color-text-muted);
     transform: translateZ(25px);
 }
 
@@ -1667,11 +1674,11 @@ footer {
     margin-top: 32px;
     padding: 8px 18px;
     border-radius: 30px;
-    background: rgba(201, 160, 199, 0.1);
-    color: #c9a0c7;
+    background: var(--color-bg-alt);
+    color: var(--color-accent);
     font-size: 0.95rem;
     font-weight: 600;
-    border: 1px solid rgba(201, 160, 199, 0.25);
+    border: 1px solid var(--color-border);
     opacity: 0;
     transform: translateZ(50px) translateY(15px);
     transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
@@ -1714,10 +1721,10 @@ footer {
 
 .cred-modal-box {
     position: relative;
-    background: #0f0a14;
-    border: 1px solid rgba(255,255,255,0.1);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.9);
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
     transform-origin: center center;
     will-change: transform, opacity;
@@ -1730,7 +1737,7 @@ footer {
     width: 100%;
     max-height: 60vh;
     object-fit: contain;
-    background: #050308;
+    background: var(--color-bg);
 }
 
 .cred-modal-info {
@@ -1749,14 +1756,14 @@ footer {
 
 .cred-modal-info h3 {
     font-size: 1.6rem;
-    color: #fff;
+    color: var(--color-text);
     margin-bottom: 8px;
     font-weight: 600;
 }
 
 .cred-modal-info p {
     font-size: 1.05rem;
-    color: rgba(255,255,255,0.7);
+    color: var(--color-text-muted);
     margin: 0;
     line-height: 1.5;
 }
@@ -1767,9 +1774,9 @@ footer {
     right: 20px;
     width: 44px; height: 44px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
     font-size: 1.4rem;
     cursor: pointer;
     backdrop-filter: blur(8px);
