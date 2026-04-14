@@ -171,250 +171,6 @@ document.addEventListener('click', e => {
     if (e.target === lb) window.closeLightbox();
 });
 
-/* ═══════════════════════════════════════════════════════
-   CAROUSEL — Spring physics engine
-   stiffness : how fast it accelerates toward target
-   damping   : how much velocity bleeds off each frame
-   → 0.12 / 0.78 gives a light, weightless bounce
-═══════════════════════════════════════════════════════ */
-(function initCarousel() {
-
-    // ── DOM refs ────────────────────────────────────────
-    const wrapper  = document.getElementById('portfolioCarousel');
-    const track    = document.getElementById('carouselTrack');
-    const dotsEl   = document.getElementById('carouselDots');
-    const btnPrev  = document.getElementById('carouselPrev');
-    const btnNext  = document.getElementById('carouselNext');
-    if (!wrapper || !track) return;
-
-    // ── Spring constants ────────────────────────────────
-    const STIFFNESS = 0.12;
-    const DAMPING   = 0.78;
-    const THRESHOLD = 0.25; // px — stop loop when delta is negligible
-
-    // ── Carousel state ──────────────────────────────────
-    let slides       = [];
-    let slideWidth   = 0;
-    let visibleCount = 3;
-    let totalPages   = 1;
-    let currentPage  = 0;
-
-    // Spring animation
-    let springPos    = 0;   // current rendered position (px, negative = left)
-    let springVel    = 0;   // current velocity
-    let springTarget = 0;   // where we want to land
-    let rafId        = null;
-
-    // Drag state
-    let isDragging  = false;
-    let dragStartX  = 0;
-    let dragOrigin  = 0;   // springPos at drag start
-    let lastX       = 0;
-    let dragVel     = 0;   // running velocity estimate (px/ms)
-    let lastTime    = 0;
-
-    // ── Measure layout ──────────────────────────────────
-    function measure() {
-        slides = Array.from(track.querySelectorAll('.carousel-slide'));
-        if (!slides.length) return;
-
-        const ww = wrapper.clientWidth;
-        // Padding left/right is on the wrapper; track itself is edge-to-edge inside
-        // Read computed padding to find the usable width
-        const style = getComputedStyle(wrapper);
-        const pl = parseFloat(style.paddingLeft)  || 0;
-        const pr = parseFloat(style.paddingRight) || 0;
-        const usable = ww - pl - pr;
-
-        const gap = 24; // px — must match CSS gap
-
-        // Detect how many slides are visible at current breakpoint
-        if (window.innerWidth <= 640)       visibleCount = 1;
-        else if (window.innerWidth <= 960)  visibleCount = 2;
-        else                                visibleCount = 3;
-
-        slideWidth  = (usable + gap) / visibleCount;
-        totalPages  = Math.max(1, slides.length - visibleCount + 1);
-        currentPage = Math.min(currentPage, totalPages - 1);
-
-        // Apply the measured width to each slide
-        slides.forEach(s => {
-            s.style.minWidth = (slideWidth - gap) + 'px';
-        });
-
-        // Instantly reposition without animation
-        springTarget = springPos = -currentPage * slideWidth;
-        track.style.transform = `translateX(${springPos}px)`;
-        updateDots();
-        updateButtons();
-    }
-
-    // ── Spring loop ─────────────────────────────────────
-    function springLoop() {
-        const delta    = springTarget - springPos;
-        springVel      = (springVel + delta * STIFFNESS) * DAMPING;
-        springPos     += springVel;
-
-        track.style.transform = `translateX(${springPos}px)`;
-
-        if (Math.abs(springVel) > THRESHOLD || Math.abs(delta) > THRESHOLD) {
-            rafId = requestAnimationFrame(springLoop);
-        } else {
-            // Snap exactly to target
-            springPos = springTarget;
-            track.style.transform = `translateX(${springPos}px)`;
-            rafId = null;
-        }
-    }
-
-    function startSpring() {
-        if (rafId) cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(springLoop);
-    }
-
-    // ── Navigate to a page ──────────────────────────────
-    function goTo(page) {
-        currentPage  = Math.max(0, Math.min(page, totalPages - 1));
-        springTarget = -currentPage * slideWidth;
-        startSpring();
-        updateDots();
-        updateButtons();
-    }
-
-    // ── Dot + button state ──────────────────────────────
-    function buildDots() {
-        dotsEl.innerHTML = '';
-        for (let i = 0; i < totalPages; i++) {
-            const dot = document.createElement('button');
-            dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-            dot.setAttribute('role', 'tab');
-            dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
-            dot.addEventListener('click', () => goTo(i));
-            dotsEl.appendChild(dot);
-        }
-    }
-
-    function updateDots() {
-        const dots = dotsEl.querySelectorAll('.carousel-dot');
-        dots.forEach((d, i) => d.classList.toggle('active', i === currentPage));
-    }
-
-    function updateButtons() {
-        if (btnPrev) btnPrev.disabled = currentPage === 0;
-        if (btnNext) btnNext.disabled = currentPage >= totalPages - 1;
-    }
-
-    // ── Pointer drag (mouse + touch via Pointer Events) ──
-    function onPointerDown(e) {
-        // Ignore clicks on the overlay / lightbox triggers
-        if (e.target.closest('.portfolio-visual')) return;
-        if (e.button !== 0 && e.pointerType === 'mouse') return;
-
-        isDragging = true;
-        dragStartX = e.clientX;
-        dragOrigin = springPos;
-        dragVel    = 0;
-        lastX      = e.clientX;
-        lastTime   = performance.now();
-
-        track.classList.add('is-dragging');
-        track.setPointerCapture(e.pointerId);
-
-        // Stop ongoing spring so drag feels immediate
-        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-    }
-
-    function onPointerMove(e) {
-        if (!isDragging) return;
-
-        const now  = performance.now();
-        const dt   = now - lastTime || 16;
-        const dx   = e.clientX - lastX;
-
-        // Running average velocity (px/ms)
-        dragVel = dragVel * 0.7 + (dx / dt) * 0.3;
-        lastX   = e.clientX;
-        lastTime = now;
-
-        // Move track live — no spring during drag
-        springPos = dragOrigin + (e.clientX - dragStartX);
-        track.style.transform = `translateX(${springPos}px)`;
-    }
-
-    function onPointerUp(e) {
-        if (!isDragging) return;
-        isDragging = false;
-        track.classList.remove('is-dragging');
-
-        // Project where finger would coast to (inertia)
-        const INERTIA_MULT = 6;  // frames to project forward at ~60fps
-        const projected = springPos + dragVel * 16 * INERTIA_MULT;
-
-        // Find the nearest page to that projected position
-        const page = Math.round(-projected / slideWidth);
-        goTo(page); // clamps internally
-    }
-
-    track.addEventListener('pointerdown',  onPointerDown, { passive: true });
-    track.addEventListener('pointermove',  onPointerMove, { passive: true });
-    track.addEventListener('pointerup',    onPointerUp);
-    track.addEventListener('pointercancel', onPointerUp);
-
-    // Prevent native scroll drag from stealing the gesture
-    track.addEventListener('dragstart', e => e.preventDefault());
-
-    // ── Arrow buttons ───────────────────────────────────
-    if (btnPrev) btnPrev.addEventListener('click', () => goTo(currentPage - 1));
-    if (btnNext) btnNext.addEventListener('click', () => goTo(currentPage + 1));
-
-    // ── Keyboard navigation ─────────────────────────────
-    wrapper.setAttribute('tabindex', '0');
-    wrapper.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft')  { goTo(currentPage - 1); e.preventDefault(); }
-        if (e.key === 'ArrowRight') { goTo(currentPage + 1); e.preventDefault(); }
-    });
-
-    // ── Staggered spring entrance via IntersectionObserver ──
-    function triggerEntrance() {
-        slides.forEach((slide, i) => {
-            slide.style.setProperty('--stagger-delay', `${i * 80}ms`);
-            // Re-trigger by removing then re-adding the class
-            slide.classList.remove('spring-enter');
-            void slide.offsetWidth; // reflow
-            slide.classList.add('spring-enter');
-        });
-    }
-
-    const entranceObserver = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                triggerEntrance();
-                entranceObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.15 });
-
-    entranceObserver.observe(wrapper);
-
-    // ── Debounced resize ────────────────────────────────
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            measure();
-            buildDots();
-        }, 150);
-    }, { passive: true });
-
-    // ── Init ────────────────────────────────────────────
-    // Wait for fonts/images to avoid measuring before layout settles
-    if (document.readyState === 'complete') {
-        measure(); buildDots();
-    } else {
-        window.addEventListener('load', () => { measure(); buildDots(); }, { once: true });
-    }
-
-})();
 
 /* ═══════════════════════════════════════════════════════
    PARALLAX — Low-friction scroll-linked animations
@@ -517,3 +273,406 @@ document.addEventListener('click', e => {
     });
 
 })();
+
+/* ═══════════════════════════════════════════════════════
+   INFINITE PHYSICS SCROLLER
+═══════════════════════════════════════════════════════ */
+function initPhysicsScroller(wrapperId, trackId, onClickCallback) {
+    const wrapper = document.getElementById(wrapperId);
+    const track = document.getElementById(trackId);
+    if (!wrapper || !track) return;
+
+    // Duplicate content for infinite loop
+    const cards = Array.from(track.children);
+    if (!cards.length) return;
+
+    // Clone sets for buffering
+    cards.forEach(c => {
+        const clone1 = c.cloneNode(true);
+        // Copy text node overlays safely if there are any
+        const clone2 = c.cloneNode(true);
+        track.appendChild(clone1);
+        track.insertBefore(clone2, track.firstChild);
+    });
+
+    const INERTIA_M = 0.96; // glide factor
+
+    let springPos    = 0;
+    let springVel    = 0;
+    let isDragging   = false;
+    let dragStartX   = 0;
+    let dragOrigin   = 0;
+    let dragVel      = 0;
+    let lastX        = 0;
+    let lastTime     = performance.now();
+    let rafId        = null;
+
+    let setWidth     = 0;
+
+    function measure() {
+        const gap = 32;
+        // The width of the original set of cards
+        const originalCards = Array.from(track.children).slice(cards.length, cards.length * 2);
+        if(!originalCards[0]) return;
+        // compute based on card offsetWidth + gap
+        setWidth = cards.length * (originalCards[0].offsetWidth + gap);
+        
+        // Start in the middle set
+        if (springPos === 0) springPos = -setWidth;
+    }
+
+    function springLoop() {
+        if (!isDragging) {
+            springVel *= INERTIA_M;
+            springPos += springVel;
+
+            // Infinite Wrap checking
+            if (springPos <= -setWidth * 2) {
+                springPos += setWidth;
+            } else if (springPos >= 0) {
+                springPos -= setWidth;
+            }
+        }
+
+        track.style.transform = `translateX(${springPos}px)`;
+        rafId = requestAnimationFrame(springLoop);
+    }
+
+    function onPointerDown(e) {
+        if (e.target.closest('.reels-modal-close')) return;
+        if (e.button !== 0 && e.pointerType === 'mouse') return;
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragOrigin = springPos;
+        dragVel    = 0;
+        lastX      = e.clientX;
+        lastTime   = performance.now();
+        track.classList.add('is-dragging');
+        track.setPointerCapture(e.pointerId);
+    }
+
+    function onPointerMove(e) {
+        if (!isDragging) return;
+        const now = performance.now();
+        const dt  = Math.max(1, now - lastTime);
+        const dx  = e.clientX - lastX;
+
+        dragVel = dragVel * 0.5 + (dx / dt) * 0.5;
+        lastX   = e.clientX;
+        lastTime = now;
+
+        springPos = dragOrigin + (e.clientX - dragStartX);
+        
+        // Instant wrap during drag
+        if (springPos <= -setWidth * 2) {
+            springPos += setWidth;
+            dragOrigin += setWidth;
+        } else if (springPos >= 0) {
+            springPos -= setWidth;
+            dragOrigin -= setWidth;
+        }
+    }
+
+    function onPointerUp(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        track.classList.remove('is-dragging');
+        springVel = dragVel * 20; // convert to frame velocity with pop
+    }
+
+    track.addEventListener('pointerdown', onPointerDown);
+    track.addEventListener('pointermove', onPointerMove);
+    track.addEventListener('pointerup', onPointerUp);
+    track.addEventListener('pointercancel', onPointerUp);
+    track.addEventListener('dragstart', e => e.preventDefault());
+
+    // Allow user to click to open modal without triggering drag
+    track.addEventListener('click', e => {
+        const card = e.target.closest('.reel-card');
+        if (card && Math.abs(dragVel) < 0.5 && Math.abs(e.clientX - dragStartX) < 10) {
+            if (onClickCallback) {
+                onClickCallback(card);
+            } else {
+                openReelModal(card);
+            }
+        }
+    });
+
+    // Observer for initial entrance
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    observer.observe(wrapper);
+
+    // Initial setup
+    window.addEventListener('load', () => {
+        measure();
+        rafId = requestAnimationFrame(springLoop);
+    });
+    window.addEventListener('resize', measure);
+
+    // Give some time for images to calculate layout
+    setTimeout(() => {
+        measure();
+        rafId = requestAnimationFrame(springLoop);
+    }, 100);
+}
+
+// Initialize for both sections
+initPhysicsScroller('portfolioCarousel', 'portfolioTrack', (card) => {
+    // Open the existing lightbox for full uncropped portfolio images
+    const src = card.dataset.full || card.querySelector('.reel-img').src;
+    openLightbox(src);
+});
+initPhysicsScroller('reelsCarousel', 'reelsTrack', (card) => {
+    // Open the shared-element expansion specifically designed for 9:16 reels
+    openReelModal(card);
+});
+
+
+/* ═══════════════════════════════════════════════════════
+   REELS MODAL — Shared Element Expansion
+═══════════════════════════════════════════════════════ */
+window.openReelModal = function(sourceCard) {
+    let modal = document.getElementById('reelsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'reelsModal';
+        modal.innerHTML = `
+            <div class="reels-modal-backdrop"></div>
+            <div class="reels-modal-content" id="reelsModalContent">
+                <img class="reels-modal-img" id="reelsModalImg" src="" alt="Reel Expanded">
+                <button class="reels-modal-close" id="reelsModalClose"><i class="ph ph-x"></i></button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        document.getElementById('reelsModalClose').addEventListener('click', closeReelModal);
+        modal.querySelector('.reels-modal-backdrop').addEventListener('click', closeReelModal);
+    }
+
+    const modalContent = document.getElementById('reelsModalContent');
+    const modalImg = document.getElementById('reelsModalImg');
+    
+    // Set GIF src
+    modalImg.src = sourceCard.dataset.full || sourceCard.querySelector('.reel-img').src;
+    
+    // Calculate rects for FLIP
+    const startRect = sourceCard.getBoundingClientRect();
+    
+    // Show modal quickly to compute target
+    modal.classList.add('active');
+    
+    // Reset any transition to measure target
+    modalContent.style.transition = 'none';
+    modalContent.style.transform = 'none';
+    
+    // Target sizing:
+    // We want it to be aspect-ratio 9/16, max 85vh height
+    const vh = window.innerHeight;
+    const vw = window.innerWidth;
+    let targetH = vh * 0.85;
+    let targetW = targetH * (9/16);
+    
+    if (targetW > vw * 0.9) {
+        targetW = vw * 0.9;
+        targetH = targetW * (16/9);
+    }
+    
+    const targetX = (vw - targetW) / 2;
+    const targetY = (vh - targetH) / 2;
+    
+    // Explicit sizing for transition
+    modalContent.style.width = targetW + 'px';
+    modalContent.style.height = targetH + 'px';
+    modalContent.style.left = targetX + 'px';
+    modalContent.style.top = targetY + 'px';
+
+    // Invert translation
+    const scaleX = startRect.width / targetW;
+    const scaleY = startRect.height / targetH;
+    const transX = startRect.left - targetX;
+    const transY = startRect.top - targetY;
+    
+    // Apply inversion
+    modalContent.style.transformOrigin = '0 0';
+    modalContent.style.transform = `translate(${transX}px, ${transY}px) scale(${scaleX}, ${scaleY})`;
+    
+    // Reflow
+    void modalContent.offsetWidth;
+    
+    // Play transition
+    modalContent.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+    modalContent.style.transform = 'translate(0, 0) scale(1, 1)';
+    
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeReelModal = function() {
+    const modal = document.getElementById('reelsModal');
+    if (!modal) return;
+    
+    modal.classList.remove('active');
+    
+    const modalContent = document.getElementById('reelsModalContent');
+    if (modalContent) {
+        modalContent.style.transform = 'translate(0, 0) scale(0.85)';
+    }
+
+    setTimeout(() => {
+        document.body.style.overflow = '';
+    }, 400);
+};
+
+// Listen to escape key for Reel Modal
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        if (typeof closeLightbox === 'function') closeLightbox();
+        if (typeof closeReelModal === 'function') closeReelModal();
+        if (typeof closeCredModal === 'function') closeCredModal();
+    }
+});
+
+
+/* ═══════════════════════════════════════════════════════
+   PROFESSIONAL CREDENTIALS
+═══════════════════════════════════════════════════════ */
+(function initCredentials() {
+    const credCards = document.querySelectorAll('.cred-card');
+    
+    credCards.forEach(card => {
+        // 6DOF Parallax Title
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            // Limit tilt logic
+            const rotateX = ((y - centerY) / centerY) * -8;
+            const rotateY = ((x - centerX) / centerX) * 8;
+            
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            // Wait for transition to finish then remove inline transition so CSS transition handles hover correctly
+            setTimeout(() => {
+                if(!card.matches(':hover')) card.style.transform = '';
+            }, 400);
+        });
+
+        // Click to snap modal
+        card.addEventListener('click', () => {
+            openCredModal(card);
+        });
+    });
+})();
+
+window.openCredModal = function(sourceCard) {
+    let modal = document.getElementById('credModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'credModal';
+        modal.className = 'cred-modal';
+        modal.innerHTML = `
+            <div class="cred-backdrop" id="credBackdrop"></div>
+            <div class="cred-modal-box" id="credModalBox">
+                <img class="cred-modal-img" id="credModalImg" src="" alt="Credential">
+                <div class="cred-modal-info">
+                    <h3 id="credModalTitle"></h3>
+                    <p id="credModalDesc"></p>
+                </div>
+                <button class="cred-close" id="credClose"><i class="ph ph-x"></i></button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById('credClose').addEventListener('click', closeCredModal);
+        document.getElementById('credBackdrop').addEventListener('click', closeCredModal);
+    }
+
+    const modalBox = document.getElementById('credModalBox');
+    const modalImg = document.getElementById('credModalImg');
+    const modalTitle = document.getElementById('credModalTitle');
+    const modalDesc = document.getElementById('credModalDesc');
+
+    // Populate data
+    const isHero = sourceCard.classList.contains('cred-hero');
+    modalTitle.textContent = sourceCard.dataset.title || '';
+    modalDesc.textContent = sourceCard.dataset.desc || '';
+    
+    // Hide image if it's the hero card without an img
+    if (isHero) {
+        modalImg.style.display = 'none';
+    } else {
+        const sourceImg = sourceCard.querySelector('img');
+        if (sourceImg) {
+            modalImg.src = sourceImg.src;
+            modalImg.style.display = 'block';
+        }
+    }
+
+    modal.classList.add('active');
+
+    // Magnetic snap (Spring animation simulation using cubic-bezier)
+    const rect = sourceCard.getBoundingClientRect();
+    
+    // Reset any transition to compute target width
+    modalBox.style.transition = 'none';
+    modalBox.style.transform = 'none';
+    modalBox.style.width = isHero ? '500px' : '90vw';
+    modalBox.style.maxWidth = isHero ? '500px' : '800px';
+
+    // Remove explicit left/top so it naturally centers via flex container
+    modalBox.style.left = '';
+    modalBox.style.top = '';
+    
+    // Measure natural flex-centered position
+    const targetRect = modalBox.getBoundingClientRect();
+    
+    // Calculate delta for inversion
+    const scaleX = rect.width / targetRect.width;
+    const scaleY = rect.height / targetRect.height;
+    const transX = rect.left - targetRect.left;
+    const transY = rect.top - targetRect.top;
+    
+    modalBox.style.transformOrigin = '0 0';
+    modalBox.style.transform = `translate(${transX}px, ${transY}px) scale(${scaleX}, ${scaleY})`;
+    modalBox.style.opacity = '0'; // Start invisible to mask the origin box difference if needed, or maybe visible
+    
+    // Actually keep it visible for seamless snapping
+    modalBox.style.opacity = '1';
+    
+    void modalBox.offsetWidth; // Reflow
+
+    // Low dampening spring transition
+    modalBox.style.transition = 'transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease';
+    modalBox.style.transform = 'translate(0, 0) scale(1, 1)';
+    
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeCredModal = function() {
+    const modal = document.getElementById('credModal');
+    if (!modal) return;
+    
+    modal.classList.remove('active');
+    
+    const modalBox = document.getElementById('credModalBox');
+    if (modalBox) {
+        modalBox.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        modalBox.style.transform = 'translate(0, 50px) scale(0.95)';
+        modalBox.style.opacity = '0';
+    }
+
+    setTimeout(() => {
+        document.body.style.overflow = '';
+    }, 400);
+};

@@ -347,91 +347,57 @@
                 <span class="section-label">Portfolio</span>
                 <h2 class="section-title">Sample Work</h2>
             </div>
-            <!-- Carousel -->
-            <div class="carousel-wrapper fade-up" id="portfolioCarousel" role="region" aria-label="Sample Work Carousel">
+            <!-- Infinite Physics Carousel for Sample Work -->
+            <div class="reels-wrapper skew-enter" id="portfolioCarousel">
+                <div class="reels-track" id="portfolioTrack">
 
-                <!-- Prev / Next arrows -->
-                <button class="carousel-btn carousel-btn--prev" id="carouselPrev" aria-label="Previous slide">
-                    <i class="ph ph-arrow-left"></i>
-                </button>
-                <button class="carousel-btn carousel-btn--next" id="carouselNext" aria-label="Next slide">
-                    <i class="ph ph-arrow-right"></i>
-                </button>
-
-                <!-- Scrollable track -->
-                <div class="carousel-track" id="carouselTrack">
-
-                    <div class="carousel-slide">
-                        <div class="portfolio-card">
-                            <div class="portfolio-visual" onclick="openLightbox('assets/media__1774128506565.jpg')">
-                                <img src="assets/media__1774128506565.jpg" alt="Tarot Reading Graphics" class="portfolio-img">
-                                <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
-                            </div>
-                            <div class="portfolio-content">
-                                <h3>Graphic Design — Tarot</h3>
-                                <p>Promotional graphics with custom typography, soft colors, and a playful layout.</p>
-                            </div>
+                    <div class="reel-card landscape" data-full="assets/media__1774128506565.jpg">
+                        <div class="reel-glow"></div>
+                        <img src="assets/media__1774128506565.jpg" alt="Tarot Reading Graphics" class="reel-img">
+                        <div class="reel-text-overlay">
+                            <h3>Graphic Design — Tarot</h3>
+                            <p>Promotional graphics with custom typography, soft colors, and a playful layout.</p>
                         </div>
                     </div>
 
-                    <div class="carousel-slide">
-                        <div class="portfolio-card">
-                            <div class="portfolio-visual" onclick="openLightbox('assets/media__1774128506571.jpg')">
-                                <img src="assets/media__1774128506571.jpg" alt="Keychain Graphics" class="portfolio-img">
-                                <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
-                            </div>
-                            <div class="portfolio-content">
-                                <h3>Product Showcase Graphics</h3>
-                                <p>Marketing graphics for an accessory collection with custom branding.</p>
-                            </div>
+                    <div class="reel-card landscape" data-full="assets/media__1774128506571.jpg">
+                        <div class="reel-glow"></div>
+                        <img src="assets/media__1774128506571.jpg" alt="Keychain Graphics" class="reel-img">
+                        <div class="reel-text-overlay">
+                            <h3>Product Showcase Graphics</h3>
+                            <p>Marketing graphics for an accessory collection with custom branding.</p>
                         </div>
                     </div>
 
-                    <div class="carousel-slide">
-                        <div class="portfolio-card">
-                            <div class="portfolio-visual" onclick="openLightbox('assets/media__1774128506586.jpg')">
-                                <img src="assets/media__1774128506586.jpg" alt="Inbox Management" class="portfolio-img">
-                                <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
-                            </div>
-                            <div class="portfolio-content">
-                                <h3>Inbox Management System</h3>
-                                <p>Custom routing rules and triaged backlogged emails for maximum efficiency.</p>
-                            </div>
+                    <div class="reel-card landscape" data-full="assets/media__1774128506586.jpg">
+                        <div class="reel-glow"></div>
+                        <img src="assets/media__1774128506586.jpg" alt="Inbox Management" class="reel-img">
+                        <div class="reel-text-overlay">
+                            <h3>Inbox Management System</h3>
+                            <p>Custom routing rules and triaged backlogged emails for maximum efficiency.</p>
                         </div>
                     </div>
 
-                    <div class="carousel-slide">
-                        <div class="portfolio-card">
-                            <div class="portfolio-visual" onclick="openLightbox('assets/media__1774128506607.jpg')">
-                                <img src="assets/media__1774128506607.jpg" alt="Slide Decks" class="portfolio-img">
-                                <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
-                            </div>
-                            <div class="portfolio-content">
-                                <h3>Slide Deck Presentations</h3>
-                                <p>Clean, structured designs tailored for readability and clear storytelling.</p>
-                            </div>
+                    <div class="reel-card landscape" data-full="assets/media__1774128506607.jpg">
+                        <div class="reel-glow"></div>
+                        <img src="assets/media__1774128506607.jpg" alt="Slide Decks" class="reel-img">
+                        <div class="reel-text-overlay">
+                            <h3>Slide Deck Presentations</h3>
+                            <p>Clean, structured designs tailored for readability and clear storytelling.</p>
                         </div>
                     </div>
 
-                    <div class="carousel-slide">
-                        <div class="portfolio-card">
-                            <div class="portfolio-visual" onclick="openLightbox('assets/media__1774128506633.jpg')">
-                                <img src="assets/media__1774128506633.jpg" alt="Google Sheets" class="portfolio-img">
-                                <div class="portfolio-overlay"><i class="ph ph-arrows-out"></i></div>
-                            </div>
-                            <div class="portfolio-content">
-                                <h3>Google Sheets Organization</h3>
-                                <p>Data tracking, attendance sheets, and structured schedules across multiple teams.</p>
-                            </div>
+                    <div class="reel-card landscape" data-full="assets/media__1774128506633.jpg">
+                        <div class="reel-glow"></div>
+                        <img src="assets/media__1774128506633.jpg" alt="Google Sheets" class="reel-img">
+                        <div class="reel-text-overlay">
+                            <h3>Google Sheets Organization</h3>
+                            <p>Data tracking, attendance sheets, and structured schedules across multiple teams.</p>
                         </div>
                     </div>
 
-                </div><!-- /carousel-track -->
-
-                <!-- Dot indicators -->
-                <div class="carousel-dots" id="carouselDots" role="tablist" aria-label="Carousel navigation"></div>
-
-            </div><!-- /carousel-wrapper -->
+                </div>
+            </div>
 
             <div class="video-showcase-header fade-up">
                 <h3>Video Editing Showcase</h3>
@@ -445,6 +411,83 @@
                 </div>
                 <div class="video-container">
                     <iframe src="https://player.vimeo.com/video/1180104094?title=0&byline=0&portrait=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ REELS PORTFOLIO ═══════════════ -->
+    <section id="reels" class="reels section-spacing bg-white">
+        <div class="container">
+            <div class="section-header fade-up" data-parallax="0.18">
+                <span class="section-label">Vertical Content</span>
+                <h2 class="section-title">Instagram Reels</h2>
+            </div>
+        </div>
+        
+        <!-- Infinite Physics Carousel for Reels -->
+        <div class="reels-wrapper skew-enter" id="reelsCarousel">
+            <div class="reels-track" id="reelsTrack">
+                <!-- Original set -->
+                <div class="reel-card" data-full="assets/zenitsu.png.jpg">
+                    <div class="reel-glow"></div>
+                    <img src="assets/zenitsu.png.jpg" alt="Zenitsu Agatsuma Charm Reel" class="reel-img" onerror="this.src='https://placehold.co/1080x1920/1c1525/c9a0c7/png?text=Zenitsu+Charm'">
+                </div>
+                <div class="reel-card" data-full="assets/kocho.png.jpg">
+                    <div class="reel-glow"></div>
+                    <img src="assets/kocho.png.jpg" alt="Kocho Shinobu Charm Reel" class="reel-img" onerror="this.src='https://placehold.co/1080x1920/1c1525/c9a0c7/png?text=Kocho+Charm'">
+                </div>
+                <div class="reel-card" data-full="assets/cam_collection.png.jpg">
+                    <div class="reel-glow"></div>
+                    <img src="assets/cam_collection.png.jpg" alt="Sanri Cam Collection Reel" class="reel-img" onerror="this.src='https://placehold.co/1080x1920/1c1525/c9a0c7/png?text=Cam+Collection'">
+                </div>
+                <div class="reel-card" data-full="assets/kuromi.png.jpg">
+                    <div class="reel-glow"></div>
+                    <img src="assets/kuromi.png.jpg" alt="Kuromi Charm Reel" class="reel-img" onerror="this.src='https://placehold.co/1080x1920/1c1525/c9a0c7/png?text=Kuromi+Charm'">
+                </div>
+                <div class="reel-card" data-full="assets/cinnamoroll.png.jpg">
+                    <div class="reel-glow"></div>
+                    <img src="assets/cinnamoroll.png.jpg" alt="Cinnamoroll Charm Reel" class="reel-img" onerror="this.src='https://placehold.co/1080x1920/1c1525/c9a0c7/png?text=Cinnamoroll+Charm'">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ CREDENTIALS ═══════════════ -->
+    <section id="credentials" class="credentials section-spacing">
+        <div class="container">
+            <div class="section-header fade-up" data-parallax="0.18">
+                <span class="section-label">Certifications</span>
+                <h2 class="section-title">Professional Credentials</h2>
+            </div>
+            
+            <div class="cred-grid" id="credGrid">
+                <!-- HERO CARD: BLEPT -->
+                <div class="cred-card cred-hero fade-up" data-title="2019 BLEPT Passer" data-desc="Licensed Professional Teacher status achieved in 2019, signifying mastery of educational methodologies and professional standards.">
+                    <div class="cred-hologram"></div>
+                    <div class="cred-content">
+                        <h3>2019 BLEPT Passer</h3>
+                        <p>Licensed Professional Teacher</p>
+                        <div class="cred-verified"><i class="ph ph-seal-check"></i> Verified</div>
+                    </div>
+                </div>
+
+                <!-- CERTIFICATE CARDS -->
+                <div class="cred-card fade-up delay-1" data-title="Intro to Content Creation" data-desc="TESDA Introduction to Content Creation">
+                    <div class="cred-glow"></div>
+                    <img src="assets/media__1776194783471.jpg" alt="TESDA Certificate - Content Creation">
+                </div>
+                <div class="cred-card fade-up delay-2" data-title="Social Media Concepts" data-desc="TESDA Creating Concepts for Social Media">
+                    <div class="cred-glow"></div>
+                    <img src="assets/media__1776194788017.jpg" alt="TESDA Certificate - Social Media">
+                </div>
+                <div class="cred-card fade-up delay-3" data-title="Logo Design" data-desc="TESDA Developing Designs for a Logo">
+                    <div class="cred-glow"></div>
+                    <img src="assets/media__1776194791790.jpg" alt="TESDA Certificate - Logo Design">
+                </div>
+                <div class="cred-card fade-up delay-4" data-title="Digital Marketing Workshop" data-desc="Excelerate Digital Marketing GoHighLevel Workshop">
+                    <div class="cred-glow"></div>
+                    <img src="assets/media__1776194795371.png" alt="Excelerate Certificate - GHL">
                 </div>
             </div>
         </div>

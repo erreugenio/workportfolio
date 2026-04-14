@@ -1341,6 +1341,452 @@ footer {
 
     .service-card { width: 100%; }
     .portfolio-card { width: 100%; min-width: unset; }
-    .tech-grid { grid-template-columns: 1fr; }
     .workflow-item { padding: 22px 20px; }
+}
+
+/* ═══════════════════════════════════════════
+   INSTAGRAM REELS
+═══════════════════════════════════════════ */
+.reels-wrapper {
+    width: 100%;
+    overflow: hidden;
+    padding: 32px 0 80px 0;
+    cursor: grab;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
+}
+.reels-wrapper:active {
+    cursor: grabbing;
+}
+
+.reels-track {
+    display: flex;
+    gap: 32px;
+    padding: 0 40px; 
+    width: max-content;
+    will-change: transform;
+}
+
+/* Skew Entrance */
+.skew-enter {
+    opacity: 0;
+    transform: translateY(80px) skewY(5deg);
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.skew-enter.in-view {
+    opacity: 1;
+    transform: translateY(0) skewY(0);
+}
+
+.reel-card {
+    position: relative;
+    width: clamp(240px, 22vw, 320px);
+    aspect-ratio: 9/16;
+    border-radius: var(--radius-lg);
+    overflow: visible;
+    transform: perspective(1000px) rotateX(0) rotateY(0) scale(1);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.reel-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    pointer-events: none;
+}
+[data-theme="dark"] .reel-img {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+
+/* Glow Border Layer */
+.reel-glow {
+    position: absolute;
+    inset: -3px;
+    border-radius: calc(var(--radius-lg) + 3px);
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft), var(--color-accent-dark));
+    z-index: -1;
+    opacity: 0;
+    filter: blur(14px);
+    transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+/* Persistent glow state */
+.reel-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 12px var(--color-accent-dark);
+    opacity: 0.15;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+/* Hover Physics */
+.reel-card:hover, .reels-track.is-dragging .reel-card {
+    transform: perspective(1000px) translateY(-12px) scale(1.04);
+    z-index: 10;
+}
+.reel-card:hover::before {
+    opacity: 0.6;
+}
+.reel-card:hover .reel-glow {
+    opacity: 0.7;
+    filter: blur(18px);
+}
+
+/* Reels Modal (Shared Element Expansion) */
+#reelsModal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+#reelsModal.active {
+    pointer-events: auto;
+    opacity: 1;
+}
+.reels-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 11, 20, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+.reels-modal-content {
+    position: absolute;
+    z-index: 2;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    /* Transformation logic handled by JS */
+}
+.reels-modal-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.reels-modal-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+    z-index: 3;
+    opacity: 0;
+    transform: scale(0.8);
+}
+#reelsModal.active .reels-modal-close {
+    opacity: 1;
+    transform: scale(1);
+    transition-delay: 0.3s;
+}
+.reels-modal-close:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.05) !important;
+}
+
+/* ── Reel Text Overlay for Portfolio Cards ── */
+.reel-text-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px 20px 24px;
+    background: linear-gradient(to top, rgba(15,11,20,0.95) 0%, rgba(15,11,20,0.6) 60%, transparent 100%);
+    color: #fff;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    opacity: 0;
+    transform: translateY(16px);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+    text-align: center;
+}
+.reel-card:hover .reel-text-overlay, .reels-track.is-dragging .reel-card .reel-text-overlay {
+    opacity: 1;
+    transform: translateY(0);
+}
+.reel-text-overlay h3 { 
+    font-size: 1.1rem; 
+    margin-bottom: 6px; 
+    color: #fff; 
+    font-weight: 600;
+}
+.reel-text-overlay p { 
+    font-size: 0.85rem; 
+    color: rgba(255,255,255,0.85); 
+    line-height: 1.4; 
+    margin: 0;
+}
+
+/* ── Landscape Variant for Portfolio cards ── */
+.reel-card.landscape {
+    width: clamp(340px, 40vw, 480px);
+    aspect-ratio: 4 / 3;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROFESSIONAL CREDENTIALS
+═══════════════════════════════════════════════════════ */
+.credentials {
+    background: #0f0a14;
+    color: #fff;
+}
+
+.cred-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    align-items: start;
+    perspective: 1500px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .cred-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .cred-hero {
+        grid-column: 1 / -1;
+    }
+}
+
+.cred-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.cred-card:hover {
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6);
+    border-color: rgba(201, 160, 199, 0.3);
+}
+
+.cred-card img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    pointer-events: none;
+    transform: translateZ(20px); /* 6DOF popout */
+    transition: transform 0.4s;
+    background: #0a0a0a;
+}
+
+/* Hero Variant (BLEPT) */
+.cred-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 380px;
+    text-align: center;
+    padding: 40px;
+    background: radial-gradient(circle at 70% 30%, rgba(201, 160, 199, 0.08), transparent 60%), rgba(20, 15, 25, 0.8);
+}
+
+.cred-hologram {
+    position: absolute;
+    inset: -100%;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(255,255,255,0.05) 60deg,
+        rgba(201,160,199,0.15) 120deg,
+        rgba(255,255,255,0.05) 180deg,
+        transparent 240deg
+    );
+    transform: translateZ(0px);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+
+.cred-card.cred-hero:hover .cred-hologram {
+    opacity: 1;
+    animation: holoSpin 6s linear infinite;
+}
+
+@keyframes holoSpin {
+    100% { transform: rotate(360deg); }
+}
+
+.cred-hero h3 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff, #c9a0c7);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transform: translateZ(40px);
+    letter-spacing: -0.5px;
+}
+
+.cred-hero p {
+    font-size: 1.15rem;
+    color: rgba(255,255,255,0.7);
+    transform: translateZ(25px);
+}
+
+.cred-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 32px;
+    padding: 8px 18px;
+    border-radius: 30px;
+    background: rgba(201, 160, 199, 0.1);
+    color: #c9a0c7;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 1px solid rgba(201, 160, 199, 0.25);
+    opacity: 0;
+    transform: translateZ(50px) translateY(15px);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cred-card.cred-hero:hover .cred-verified {
+    opacity: 1;
+    transform: translateZ(50px) translateY(0);
+}
+
+/* Modal snap styling */
+.cred-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1500px;
+}
+
+.cred-modal.active {
+    pointer-events: auto;
+}
+
+.cred-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.cred-modal.active .cred-backdrop {
+    opacity: 1;
+}
+
+.cred-modal-box {
+    position: relative;
+    background: #0f0a14;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.9);
+    overflow: hidden;
+    transform-origin: center center;
+    will-change: transform, opacity;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.cred-modal-img {
+    width: 100%;
+    max-height: 60vh;
+    object-fit: contain;
+    background: #050308;
+}
+
+.cred-modal-info {
+    padding: 32px 40px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    flex-shrink: 0;
+}
+
+.cred-modal.active .cred-modal-info {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.cred-modal-info h3 {
+    font-size: 1.6rem;
+    color: #fff;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.cred-modal-info p {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.7);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.cred-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 1.4rem;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity: 0;
+    transform: scale(0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+.cred-modal.active .cred-close {
+    opacity: 1;
+    transform: scale(1);
+    transition-delay: 0.3s;
+}
+.cred-close:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.05) !important;
 }
